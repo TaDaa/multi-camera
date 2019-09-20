@@ -1,0 +1,10 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "system",
+    "target": "es5",
+    "sourceMap": true,
+    "outFile": "./dist/multicamera.js"
+  },
+  "files": ["./src/index.ts"]
+}
