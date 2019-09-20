@@ -2,6 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {
     "module": "system",
+    "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,
     "outDir": "./dist",
