@@ -1,22 +1,8 @@
-"use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var html = require("./multicamera.html");
-var css = require("./multicamera.css");
+import * as html from './multicamera.html';
+import * as css from './multicamera.css';
 ;
-var MultiCamera = /** @class */ (function () {
-    function MultiCamera() {
-        var _this = this;
+export class MultiCamera {
+    constructor() {
         this._images = [];
         this._maxZoom = 5;
         this._minZoom = 1;
@@ -28,8 +14,8 @@ var MultiCamera = /** @class */ (function () {
         };
         this.touchTypes = MultiCamera.touchTypes;
         MultiCamera._camera = this;
-        var element = this._element = MultiCamera._template.cloneNode(true);
-        var _a = this._elements = {
+        const element = this._element = MultiCamera._template.cloneNode(true);
+        const { overlay, takePhoto, back, cancel, usePhotos } = this._elements = {
             overlay: element,
             zoomPlus: element.querySelector('.camera-zoom-plus'),
             zoomMinus: element.querySelector('.camera-zoom-minus'),
@@ -48,7 +34,7 @@ var MultiCamera = /** @class */ (function () {
             photoOverlay: element.querySelector('.camera-photo-overlay'),
             photoOverlayBackground: element.querySelector('.camera-photo-overlay-background'),
             back: element.querySelector('.camera-photo-overlay-text.back')
-        }, overlay = _a.overlay, takePhoto = _a.takePhoto, back = _a.back, cancel = _a.cancel, usePhotos = _a.usePhotos, emTest = document.createElement('div');
+        }, emTest = document.createElement('div');
         emTest.style.width = emTest.style.height = '1em';
         emTest.style.position = 'absolute';
         emTest.style.opacity = '0';
@@ -62,14 +48,14 @@ var MultiCamera = /** @class */ (function () {
         this._operations = [];
         this._onDeviceReady = this._onDeviceReady.bind(this);
         this._onOrientationChange = this._onOrientationChange.bind(this);
-        cancel.addEventListener('click', function () { return _this._onCancelClick(); }, true);
-        usePhotos.addEventListener('click', function () { return _this._onUsePhotosClick(); }, true);
-        overlay.addEventListener('touchend', function (event) { return _this._onOverlayTouchEnd(event); }, true);
-        back.addEventListener('click', function () { return _this._onPhotoOverlayBackClick(); }, true);
-        overlay.addEventListener('touchmove', function (event) { return _this._onOverlayTouchMove(event); }, true);
-        overlay.addEventListener('touchstart', function (event) { return _this._onOverlayTouchStart(event); }, true);
-        overlay.addEventListener('touchcancel', function (event) { return _this._onOverlayTouchCancel(event); }, true);
-        takePhoto.addEventListener('transitionend', function () { return _this._onTakePhotoTransitionEnd(); });
+        cancel.addEventListener('click', () => this._onCancelClick(), true);
+        usePhotos.addEventListener('click', () => this._onUsePhotosClick(), true);
+        overlay.addEventListener('touchend', (event) => this._onOverlayTouchEnd(event), true);
+        back.addEventListener('click', () => this._onPhotoOverlayBackClick(), true);
+        overlay.addEventListener('touchmove', (event) => this._onOverlayTouchMove(event), true);
+        overlay.addEventListener('touchstart', (event) => this._onOverlayTouchStart(event), true);
+        overlay.addEventListener('touchcancel', (event) => this._onOverlayTouchCancel(event), true);
+        takePhoto.addEventListener('transitionend', () => this._onTakePhotoTransitionEnd());
         //TODO consider add in show remove eventlistener in hide
         window.addEventListener('resize', this._onOrientationChange);
         if (typeof window['device'] === 'undefined' || typeof window['device'].cordova === 'undefined') {
@@ -79,33 +65,33 @@ var MultiCamera = /** @class */ (function () {
             this._onDeviceReady();
         }
     }
-    MultiCamera.prototype.addEventListener = function (name, fn) {
+    addEventListener(name, fn) {
         this._events[name].push(fn);
-    };
-    MultiCamera.prototype.removeEventListener = function (name, fn) {
-        var events = this._events[name], index = events.indexOf(fn);
+    }
+    removeEventListener(name, fn) {
+        const events = this._events[name], index = events.indexOf(fn);
         if (index !== -1) {
             events.splice(index, 1);
         }
-    };
-    MultiCamera.prototype.dispatchEvent = function (event) {
-        var events = this._events[event.type];
+    }
+    dispatchEvent(event) {
+        const events = this._events[event.type];
         for (var i = 0, ln = events.length; i < ln; i++) {
             events[i](event);
         }
-    };
-    MultiCamera.prototype.getScreenDimensions = function () {
-        var _a = window.screen, height = _a.height, width = _a.width;
+    }
+    getScreenDimensions() {
+        var { height, width } = window.screen;
         if (typeof orientation === 'number') {
-            if (Math.abs(parseInt("" + window.orientation) / 90) === 1) {
+            if (Math.abs(parseInt(`${window.orientation}`) / 90) === 1) {
                 height = window.screen.width;
                 width = window.screen.height;
             }
         }
-        return { width: width, height: height };
-    };
-    MultiCamera.prototype.show = function (config) {
-        var preview = window['CameraPreview'], overlay = this._elements.overlay, _a = this.getScreenDimensions(), width = _a.width, height = _a.height;
+        return { width, height };
+    }
+    show(config) {
+        const preview = window['CameraPreview'], { overlay } = this._elements, { width, height } = this.getScreenDimensions();
         //TODO check this
         overlay.style.display = 'none';
         if (this._show === true) {
@@ -116,10 +102,10 @@ var MultiCamera = /** @class */ (function () {
             return;
         }
         this._show = true;
-        preview.stopCamera(function () {
+        preview.stopCamera(() => {
             console.error('CameraPreview.stopCamera', 'SUCCESS');
             startCamera();
-        }, function (err) {
+        }, (err) => {
             console.error('CameraPreview.stopCamera', err);
             startCamera();
         });
@@ -127,108 +113,105 @@ var MultiCamera = /** @class */ (function () {
             preview.startCamera({
                 x: 0,
                 y: 0,
-                width: width,
-                height: height,
+                width,
+                height,
                 camera: preview.CAMERA_DIRECTION.BACK,
                 toBack: true,
                 tapPhoto: false,
                 tapFocus: false,
                 previewDrag: false
-            }, function () {
+            }, () => {
                 console.error('CameraPreview.startCamera', 'SUCCESS');
                 overlay.style.display = null;
                 document.body.parentNode.style.visibility = "hidden";
-            }, function (err) { return console.error('CameraPreview.startCamera', err); });
+            }, (err) => console.error('CameraPreview.startCamera', err));
         }
         return this;
-    };
-    MultiCamera.prototype.hide = function () {
-        var _this = this;
-        var preview = window['CameraPreview'], overlay = this._elements.overlay;
+    }
+    hide() {
+        const preview = window['CameraPreview'], { overlay } = this._elements;
         if (this._ready && this._show) {
             this._show = false;
-            window['Promise'].all(this._operations).then(function () {
-                preview.stopCamera(function () {
+            window['Promise'].all(this._operations).then(() => {
+                preview.stopCamera(() => {
                     overlay.style.display = 'none';
-                    _this._elements.photoOverlay.style.display = 'none';
+                    this._elements.photoOverlay.style.display = 'none';
                     document.body.parentNode.style.visibility = 'visible';
                     console.error('CameraPreview.stopCamera', 'SUCCESS');
-                }, function (err) { return console.error('CameraPreview.stopCamera', err); });
+                }, (err) => console.error('CameraPreview.stopCamera', err));
             });
         }
         return this;
-    };
-    MultiCamera.prototype.takePhoto = function () {
-        var _this = this;
+    }
+    takePhoto() {
         if (!this._ready) {
             return;
         }
-        var tookPicture = document.createElement('div'), overlay = this._elements.overlay, _a = this.getScreenDimensions(), width = _a.width, height = _a.height;
+        const tookPicture = document.createElement('div'), { overlay } = this._elements, { width, height } = this.getScreenDimensions();
         tookPicture.className = 'camera-took-picture';
         if (!this._takingPicture) {
             this._takingPicture = true;
             overlay.classList.add('taking-picture');
         }
-        tookPicture.addEventListener('transitionend', function () {
-            _this._takingPicture = false;
+        tookPicture.addEventListener('transitionend', () => {
+            this._takingPicture = false;
             if (tookPicture.parentNode) {
                 tookPicture.parentNode.removeChild(tookPicture);
             }
         });
-        setTimeout(function () { return tookPicture.style.opacity = '0'; });
+        setTimeout(() => tookPicture.style.opacity = '0');
         overlay.appendChild(tookPicture);
-        var promise = new window['Promise'](function (resolve) {
+        const promise = new window['Promise']((resolve) => {
             var resolved = false;
-            var preview = window['CameraPreview'];
-            preview.takePicture({ width: width, height: height }, function (base64) {
-                var image = {
-                    data: "data:image/jpg;base64," + base64[0],
-                    width: width,
-                    height: height
-                }, photoWrapper = MultiCamera._photoWrapperTemplate.cloneNode(true), photoElement = photoWrapper.querySelector('.camera-photo'), removeElement = photoWrapper.querySelector('.camera-photo-remove'), bottomToolbar = _this._elements.bottomToolbar, tookPhotoEvent = new CustomEvent('tookphoto', { detail: { data: image.data, width: image.width, height: image.height } });
-                photoElement.style.backgroundImage = "url(\"" + image.data + "\")";
+            const preview = window['CameraPreview'];
+            preview.takePicture({ width, height }, (base64) => {
+                const image = {
+                    data: `data:image/jpg;base64,${base64[0]}`,
+                    width,
+                    height
+                }, photoWrapper = MultiCamera._photoWrapperTemplate.cloneNode(true), photoElement = photoWrapper.querySelector('.camera-photo'), removeElement = photoWrapper.querySelector('.camera-photo-remove'), { bottomToolbar } = this._elements, tookPhotoEvent = new CustomEvent('tookphoto', { detail: { data: image.data, width: image.width, height: image.height } });
+                photoElement.style.backgroundImage = `url("${image.data}")`;
                 bottomToolbar.insertBefore(photoWrapper, bottomToolbar.childNodes[0]);
-                setTimeout(function () {
+                setTimeout(() => {
                     photoElement.style.transform = 'scale(1)translate(0px, 0px)';
                     removeElement.style.transform = 'translateX(0px)';
                 });
-                removeElement.addEventListener('click', function () {
-                    _this._removeImage(image);
+                removeElement.addEventListener('click', () => {
+                    this._removeImage(image);
                 }, true);
-                photoWrapper.addEventListener('click', function ($event) {
-                    _this._chooseActivePhoto(image, $event);
+                photoWrapper.addEventListener('click', ($event) => {
+                    this._chooseActivePhoto(image, $event);
                 }, true);
-                _this.dispatchEvent(tookPhotoEvent);
+                this.dispatchEvent(tookPhotoEvent);
                 image.wrapper = photoWrapper;
                 image.element = photoElement;
-                _this._images.unshift(image);
-                _this._doLayout();
+                this._images.unshift(image);
+                this._doLayout();
                 resolved = true;
                 resolve();
-            }, function () {
+            }, () => {
                 resolved = true;
                 resolve();
             });
-            setTimeout(function () {
+            setTimeout(() => {
                 if (!resolved) {
                     resolve();
                 }
             }, 3000);
         });
         this._operations.push(promise);
-        promise.then(function () {
-            var index = _this._operations.indexOf(promise);
+        promise.then(() => {
+            const index = this._operations.indexOf(promise);
             if (index !== -1) {
-                _this._operations.splice(index, 1);
+                this._operations.splice(index, 1);
             }
         });
-    };
-    MultiCamera.prototype._removeImage = function (image) {
-        var _this = this;
+    }
+    _removeImage(image) {
         if (!image) {
             return;
         }
-        var index = this._images.indexOf(image), wrapper = image.wrapper;
+        const index = this._images.indexOf(image), { wrapper } = image;
         if (index !== -1) {
             this._images.splice(index, 1);
         }
@@ -236,22 +219,22 @@ var MultiCamera = /** @class */ (function () {
             this._hidePhotoOverlay();
         }
         image.removed = true;
-        wrapper.style.transform = wrapper.style.transform.split('scale(1)')[0] + "scale(0)";
+        wrapper.style.transform = `${wrapper.style.transform.split('scale(1)')[0]}scale(0)`;
         wrapper.style.opacity = '0';
-        wrapper.addEventListener('transitionend', function () {
+        wrapper.addEventListener('transitionend', () => {
             if (wrapper.parentNode) {
-                _this._elements.bottomToolbar.removeChild(wrapper);
+                this._elements.bottomToolbar.removeChild(wrapper);
             }
         });
         this._doLayout();
         if (image === this._activePhoto) {
-            var next = this._images[index] || this._images[this._images.length - 1];
+            const next = this._images[index] || this._images[this._images.length - 1];
             if (next) {
                 this._chooseActivePhoto(next, null);
             }
         }
-    };
-    MultiCamera.prototype._chooseActivePhoto = function (image, event) {
+    }
+    _chooseActivePhoto(image, event) {
         if (event && event.target['classList'] && event.target['classList'].contains('camera-photo-remove')) {
             return;
         }
@@ -261,60 +244,58 @@ var MultiCamera = /** @class */ (function () {
         this._activePhoto = image;
         this._showPhotoOverlay();
         image.wrapper.classList.add('active');
-    };
-    MultiCamera.prototype._hidePhotoOverlay = function () {
-        var _this = this;
-        var image = this._activePhoto, original = (image || {}).wrapper, wrapper = this._showingPhotoOverlay !== false ? this._showingPhotoOverlay.wrapper : this._showingPhotoOverlay, rect = original && original.getBoundingClientRect(), elements = this._elements;
+    }
+    _hidePhotoOverlay() {
+        const image = this._activePhoto, { wrapper: original } = image || {}, wrapper = this._showingPhotoOverlay !== false ? this._showingPhotoOverlay.wrapper : this._showingPhotoOverlay, rect = original && original.getBoundingClientRect(), elements = this._elements;
         if (!wrapper) {
             return;
         }
         original.classList.remove('active');
         this._showingPhotoOverlay = false;
         if (wrapper.parentNode === elements.photoOverlay) {
-            var photo = wrapper.querySelector('.camera-photo');
+            const photo = wrapper.querySelector('.camera-photo');
             elements.back.style.opacity = '0';
             elements.photoOverlayBackground.style.opacity = '0';
             wrapper.style.height = null;
             wrapper.style.width = null;
-            wrapper.style.left = rect.x / this._emToPx + "em";
+            wrapper.style.left = `${rect.x / this._emToPx}em`;
             wrapper.style.bottom = '0em';
             photo.style.opacity = '0';
             if (image.removed) {
                 wrapper.style.transform = 'translate(0em,0em)scale(0)';
             }
-            wrapper.addEventListener('transitionend', function () {
+            wrapper.addEventListener('transitionend', () => {
                 if (wrapper.parentNode) {
-                    if (!_this._showingPhotoOverlay) {
+                    if (!this._showingPhotoOverlay) {
                         elements.photoOverlay.style.display = 'none';
                     }
                     elements.photoOverlay.removeChild(wrapper);
                 }
             });
         }
-    };
-    MultiCamera.prototype._showPhotoOverlay = function () {
-        var _this = this;
-        var image = this._activePhoto, width = image.width, height = image.height, original = image.wrapper, data = image.data, rect = original.getBoundingClientRect(), elements = this._elements;
+    }
+    _showPhotoOverlay() {
+        const image = this._activePhoto, { width, height, wrapper: original, data } = image, rect = original.getBoundingClientRect(), elements = this._elements;
         if (this._showingPhotoOverlay) {
             this._hidePhotoOverlay();
         }
-        var wrapper = (this._showingPhotoOverlay = { data: data, width: width, height: height, wrapper: original.cloneNode(true) }).wrapper, photo = wrapper.querySelector('.camera-photo'), remove = wrapper.querySelector('.camera-photo-remove');
+        const { wrapper } = this._showingPhotoOverlay = { data, width, height, wrapper: original.cloneNode(true) }, photo = wrapper.querySelector('.camera-photo'), remove = wrapper.querySelector('.camera-photo-remove');
         wrapper.style.boxShadow = 'none';
         elements.photoOverlay.style.display = 'block';
         wrapper.style.transform = 'translate(0em,0em)scale(1)';
-        wrapper.style.left = rect.x / this._emToPx + "em";
+        wrapper.style.left = `${rect.x / this._emToPx}em`;
         elements.photoOverlay.appendChild(wrapper);
         wrapper.removeChild(remove);
         photo.style.opacity = '0';
-        setTimeout(function () {
+        setTimeout(() => {
             elements.back.style.opacity = '1';
             elements.photoOverlayBackground.style.opacity = '1';
             photo.style.opacity = '1';
-            _this._centerPhotoOverlay();
+            this._centerPhotoOverlay();
         });
-    };
-    MultiCamera.prototype._centerPhotoOverlay = function () {
-        var dimensions = this.getScreenDimensions(), cloneImage = this._showingPhotoOverlay, _a = cloneImage || {}, width = _a.width, height = _a.height, wrapper = _a.wrapper;
+    }
+    _centerPhotoOverlay() {
+        const dimensions = this.getScreenDimensions(), cloneImage = this._showingPhotoOverlay, { width, height, wrapper } = cloneImage || {};
         var scale;
         if (width > dimensions.width) {
             scale = dimensions.width / width;
@@ -327,61 +308,59 @@ var MultiCamera = /** @class */ (function () {
         if (scale === undefined) {
             scale = 1;
         }
-        var cx = (dimensions.width - width * scale) / 2 / this._emToPx, cy = (dimensions.height - height * scale) / 2 / this._emToPx;
-        wrapper.style.height = height * scale + "px";
-        wrapper.style.width = width * scale + "px";
-        wrapper.style.left = cx + "em";
-        wrapper.style.bottom = cy + "em";
-    };
-    MultiCamera.prototype.focus = function (_a) {
-        var x = _a.x, y = _a.y;
-        var preview = window['CameraPreview'];
+        const cx = (dimensions.width - width * scale) / 2 / this._emToPx, cy = (dimensions.height - height * scale) / 2 / this._emToPx;
+        wrapper.style.height = `${height * scale}px`;
+        wrapper.style.width = `${width * scale}px`;
+        wrapper.style.left = `${cx}em`;
+        wrapper.style.bottom = `${cy}em`;
+    }
+    focus({ x, y }) {
+        const preview = window['CameraPreview'];
         if (this._ready) {
-            console.error("MultiCamera.focus(" + [x, y] + ")");
-            preview.tapToFocus(x, y, function () { }, function (err) { return console.error('CameraPreview.tapToFocus', err); });
+            console.error(`MultiCamera.focus(${[x, y]})`);
+            preview.tapToFocus(x, y, () => { }, (err) => console.error('CameraPreview.tapToFocus', err));
         }
         return this;
-    };
-    MultiCamera.prototype.switchCamera = function () {
-        var _this = this;
-        var preview = window['CameraPreview'];
+    }
+    switchCamera() {
+        const preview = window['CameraPreview'];
         if (this._ready && preview) {
-            window['Promise'].all(this._operations).then(function () {
-                var promise = new window['Promise'](function (resolve) {
+            window['Promise'].all(this._operations).then(() => {
+                const promise = new window['Promise']((resolve) => {
                     var resolved = false;
-                    preview.switchCamera(function () {
-                        _this._frontCamera = !_this._frontCamera;
-                        _this.zoom(1);
+                    preview.switchCamera(() => {
+                        this._frontCamera = !this._frontCamera;
+                        this.zoom(1);
                         resolved = true;
                         resolve();
-                    }, function (err) {
+                    }, (err) => {
                         console.error('CameraPreview.switchCamera', err);
                         resolved = true;
                         resolve();
                     });
-                    setTimeout(function () {
+                    setTimeout(() => {
                         if (!resolved) {
                             resolve();
                         }
                     }, 3000);
                 });
-                _this._operations.push(promise);
-                promise.then(function () {
-                    var index = _this._operations.indexOf(promise);
+                this._operations.push(promise);
+                promise.then(() => {
+                    const index = this._operations.indexOf(promise);
                     if (index !== -1) {
-                        _this._operations.splice(index, 1);
+                        this._operations.splice(index, 1);
                     }
                 });
             });
         }
         return this;
-    };
-    MultiCamera.prototype.zoom = function (zoom) {
-        var preview = window['CameraPreview'];
+    }
+    zoom(zoom) {
+        const preview = window['CameraPreview'];
         if (!this._ready || !preview) {
             return;
         }
-        var _a = this, _maxZoom = _a._maxZoom, _minZoom = _a._minZoom, _b = this._elements, zoomBG = _b.zoomBG, zoomBGWrapper = _b.zoomBGWrapper, zoomThumb = _b.zoomThumb, backgroundRect = zoomBG.getBoundingClientRect(), backgroundHeight = backgroundRect.height;
+        const { _maxZoom, _minZoom } = this, { zoomBG, zoomBGWrapper, zoomThumb } = this._elements, backgroundRect = zoomBG.getBoundingClientRect(), backgroundHeight = backgroundRect.height;
         if (zoom < _minZoom) {
             zoom = _minZoom;
         }
@@ -389,63 +368,62 @@ var MultiCamera = /** @class */ (function () {
             zoom = _maxZoom;
         }
         this._zoom = zoom;
-        var div = ((zoom - 1) / (this._maxZoom - 1)), top = div * backgroundHeight;
-        zoomThumb.style.transform = "translateY(" + -top + "px)translate(-50%, 50%)";
-        zoomBGWrapper.style.webkitMaskPosition = "50% " + (div * 100) + "%";
-        preview.setZoom(zoom, function () { }, function (err) { return console.error('CameraPreview.setZoom', err); });
+        const div = ((zoom - 1) / (this._maxZoom - 1)), top = div * backgroundHeight;
+        zoomThumb.style.transform = `translateY(${-top}px)translate(-50%, 50%)`;
+        zoomBGWrapper.style.webkitMaskPosition = `50% ${(div * 100)}%`;
+        preview.setZoom(zoom, () => { }, (err) => console.error('CameraPreview.setZoom', err));
         return this;
-    };
-    MultiCamera.prototype._doLayout = function () {
-        var images = this._images, width = 3.5, ln = images.length;
+    }
+    _doLayout() {
+        const images = this._images, width = 3.5, ln = images.length;
         var image, i = 0;
         for (; i < ln; i++) {
             image = images[i];
             image.x = i * width;
-            image.wrapper.style.transform = "translate(" + (i * width) + "em, 0em)scale(1)";
+            image.wrapper.style.transform = `translate(${(i * width)}em, 0em)scale(1)`;
         }
         return this;
-    };
-    MultiCamera.prototype._reset = function () {
-        var _a = this._elements, bottomToolbar = _a.bottomToolbar, zoomThumb = _a.zoomThumb, zoomBGWrapper = _a.zoomBGWrapper;
+    }
+    _reset() {
+        const { bottomToolbar, zoomThumb, zoomBGWrapper } = this._elements;
         bottomToolbar.innerHTML = '';
-        zoomThumb.style.transform = "translateY(0px)translate(-50%, 50%)";
-        zoomBGWrapper.style.webkitMaskPosition = "50% 0%";
+        zoomThumb.style.transform = `translateY(0px)translate(-50%, 50%)`;
+        zoomBGWrapper.style.webkitMaskPosition = `50% 0%`;
         this._images = [];
         this._touchState = { type: MultiCamera.touchTypes.NONE };
         this._frontCamera = false;
         this._zoom = 1;
         this._minZoom = 1;
         this._maxZoom = 5;
-    };
-    MultiCamera.prototype._onDeviceReady = function () {
+    }
+    _onDeviceReady() {
         this._ready = true;
         if (this._show) {
-            var show = this._show;
+            const show = this._show;
             this._show = false;
             this.show(show);
         }
         this.zoom(this._zoom);
         this._onOrientationChange();
         document.removeEventListener('deviceready', this._onDeviceReady);
-    };
-    MultiCamera.prototype._onOverlayTouchStart = function (event) {
-        var _this = this;
-        var _a = this._elements, zoomPlus = _a.zoomPlus, zoomMinus = _a.zoomMinus, reverseCamera = _a.reverseCamera, overlay = _a.overlay, classList = event.target['classList'] || { contains: function () { return false; } }, num_touches = event.touches.length;
+    }
+    _onOverlayTouchStart(event) {
+        const { zoomPlus, zoomMinus, reverseCamera, overlay } = this._elements, classList = event.target['classList'] || { contains: () => false }, num_touches = event.touches.length;
         var touchState = this._touchState, plusTimer, minusTimer;
         if (classList.contains('camera-zoom-part') && num_touches === 1) {
-            touchState = this._touchState = __assign(__assign({}, touchState), { type: MultiCamera.touchTypes.DRAG_ZOOM_THUMB, zoom: this._zoom, xStart: event.pageX, yStart: event.pageY, target: event.target, startEvent: event });
+            touchState = this._touchState = Object.assign(Object.assign({}, touchState), { type: MultiCamera.touchTypes.DRAG_ZOOM_THUMB, zoom: this._zoom, xStart: event.pageX, yStart: event.pageY, target: event.target, startEvent: event });
         }
         else if (event.target === zoomPlus && num_touches === 1) {
             this._onZoomPlusMouseDown();
-            touchState = this._touchState = __assign(__assign({}, touchState), { type: MultiCamera.touchTypes.HOLD_ZOOM_PLUS, plusTimer: setTimeout(plusTimer = function () {
-                    _this._onZoomPlusMouseDown();
+            touchState = this._touchState = Object.assign(Object.assign({}, touchState), { type: MultiCamera.touchTypes.HOLD_ZOOM_PLUS, plusTimer: setTimeout(plusTimer = () => {
+                    this._onZoomPlusMouseDown();
                     touchState.plusTimer = setTimeout(plusTimer, 100);
                 }, 100) });
         }
         else if (event.target === zoomMinus && num_touches === 1) {
             this._onZoomMinusMouseDown();
-            touchState = this._touchState = __assign(__assign({}, touchState), { type: MultiCamera.touchTypes.HOLD_ZOOM_MINUS, minusTimer: setTimeout(minusTimer = function () {
-                    _this._onZoomMinusMouseDown();
+            touchState = this._touchState = Object.assign(Object.assign({}, touchState), { type: MultiCamera.touchTypes.HOLD_ZOOM_MINUS, minusTimer: setTimeout(minusTimer = () => {
+                    this._onZoomMinusMouseDown();
                     touchState.minusTimer = setTimeout(minusTimer, 100);
                 }, 100) });
         }
@@ -477,9 +455,9 @@ var MultiCamera = /** @class */ (function () {
                 touchState.not_click = true;
             }
         }
-    };
-    MultiCamera.prototype._onOverlayTouchEnd = function (event) {
-        var touchState = this._touchState, type = touchState.type;
+    }
+    _onOverlayTouchEnd(event) {
+        var touchState = this._touchState, { type } = touchState;
         if (type === MultiCamera.touchTypes.HOLD_ZOOM_PLUS) {
             clearTimeout(touchState.plusTimer);
             touchState = { type: MultiCamera.touchTypes.NONE };
@@ -492,7 +470,7 @@ var MultiCamera = /** @class */ (function () {
             if (!touchState.not_click) {
                 this._onOverlayClick(event);
             }
-            var touches = event.changedTouches, starts = touchState.starts, order = touchState.order;
+            const touches = event.changedTouches, starts = touchState.starts, order = touchState.order;
             var touch;
             for (var i = 0, ln = touches.length; i < ln; i++) {
                 touch = touches[i];
@@ -511,18 +489,18 @@ var MultiCamera = /** @class */ (function () {
             touchState.type = MultiCamera.touchTypes.NONE;
         }
         this._touchState = touchState;
-    };
-    MultiCamera.prototype._onOverlayTouchCancel = function (event) {
+    }
+    _onOverlayTouchCancel(event) {
         this._onOverlayTouchEnd(event);
-    };
-    MultiCamera.prototype._onOverlayTouchMove = function (event) {
-        var touchState = this._touchState, type = touchState.type;
+    }
+    _onOverlayTouchMove(event) {
+        var touchState = this._touchState, { type } = touchState;
         if (type === MultiCamera.touchTypes.DRAG_ZOOM_THUMB) {
-            var pageY = event.pageY - touchState.yStart, background = this._elements.zoomBG, backgroundRect = background.getBoundingClientRect(), backgroundHeight = backgroundRect.height;
+            const pageY = event.pageY - touchState.yStart, background = this._elements.zoomBG, backgroundRect = background.getBoundingClientRect(), backgroundHeight = backgroundRect.height;
             this.zoom(touchState.zoom - pageY / backgroundHeight * 3);
         }
         else if (type == MultiCamera.touchTypes.DRAG_ZOOM_FINGERS) {
-            var starts = touchState.starts, order = touchState.order, start1 = starts[order[0]], start2 = starts[order[1]], touches = event.touches, dimensions = this.getScreenDimensions(), width = dimensions.width, height = dimensions.height;
+            const { starts, order } = touchState, start1 = starts[order[0]], start2 = starts[order[1]], touches = event.touches, dimensions = this.getScreenDimensions(), { width, height } = dimensions;
             var current1, current2, startX1, startX2, startY1, startY2, currentX1, currentX2, currentY1, currentY2, dist1, dist2, touch, diff;
             for (var i = 0, ln = touches.length; i < ln; i++) {
                 touch = touches[i];
@@ -564,86 +542,82 @@ var MultiCamera = /** @class */ (function () {
                 this.zoom(touchState.zoom + diff / Math.min(width, height) * 6);
             }
         }
-    };
-    MultiCamera.prototype._onOrientationChange = function () {
-        var _this = this;
-        var preview = window['CameraPreview'], dimensions = this.getScreenDimensions(), width = dimensions.width, height = dimensions.height;
+    }
+    _onOrientationChange() {
+        const preview = window['CameraPreview'], dimensions = this.getScreenDimensions(), { width, height } = dimensions;
         if (this.show && this._ready && preview) {
-            preview.setPreviewSize(dimensions, function () {
-                var doneDimensions = _this.getScreenDimensions();
+            preview.setPreviewSize(dimensions, () => {
+                const doneDimensions = this.getScreenDimensions();
                 if (doneDimensions.width !== width || doneDimensions.height !== height) {
-                    _this._onOrientationChange();
+                    this._onOrientationChange();
                 }
-            }, function (err) { return console.error('CameraPreview.setPreviewSize', err); });
+            }, (err) => console.error('CameraPreview.setPreviewSize', err));
         }
         if (this._showingPhotoOverlay) {
             this._centerPhotoOverlay();
         }
-    };
-    MultiCamera.prototype._onOverlayClick = function (_a) {
-        var x = _a.pageX, y = _a.pageY;
-        this.focus({ x: x, y: y });
-    };
-    MultiCamera.prototype._onReverseCameraClick = function () {
+    }
+    _onOverlayClick({ pageX: x, pageY: y }) {
+        this.focus({ x, y });
+    }
+    _onReverseCameraClick() {
         this.switchCamera();
-    };
-    MultiCamera.prototype._onZoomPlusMouseDown = function () {
+    }
+    _onZoomPlusMouseDown() {
         if ((this._zoom + 0.15) <= this._maxZoom) {
             this.zoom(this._zoom + 0.15);
         }
         else {
             this.zoom(this._maxZoom);
         }
-    };
-    MultiCamera.prototype._onZoomMinusMouseDown = function () {
+    }
+    _onZoomMinusMouseDown() {
         if ((this._zoom - 0.15) >= this._minZoom) {
             this.zoom(this._zoom - 0.15);
         }
         else {
             this.zoom(this._minZoom);
         }
-    };
-    MultiCamera.prototype._onTakePhotoTransitionEnd = function () {
-        var overlay = this._elements.overlay;
+    }
+    _onTakePhotoTransitionEnd() {
+        const { overlay } = this._elements;
         if (overlay && overlay.classList && overlay.classList.contains('taking-picture')) {
             overlay.classList.remove('taking-picture');
         }
-    };
-    MultiCamera.prototype._onPhotoOverlayBackClick = function () {
+    }
+    _onPhotoOverlayBackClick() {
         this._hidePhotoOverlay();
-    };
-    MultiCamera.prototype._onCancelClick = function () {
-        var _this = this;
+    }
+    _onCancelClick() {
         if (this._show) {
             this.hide();
             window['Promise'].all(this._operations)
-                .then(function () {
-                var event = new CustomEvent('cancel', { detail: [] });
-                _this.dispatchEvent(event);
-                _this._reset();
+                .then(() => {
+                const event = new CustomEvent('cancel', { detail: [] });
+                this.dispatchEvent(event);
+                this._reset();
             });
         }
-    };
-    MultiCamera.prototype._onUsePhotosClick = function () {
-        var _this = this;
+    }
+    _onUsePhotosClick() {
         if (this._show) {
             this.hide();
-            window['Promise'].all(this._operations).then(function () {
+            window['Promise'].all(this._operations).then(() => {
                 console.error('donenenene');
-                var event = new CustomEvent('usephotos', { detail: _this._images.map(function (d) { return ({ width: d.width, height: d.height, data: d.data }); }) });
-                _this.dispatchEvent(event);
-                _this._reset();
+                const event = new CustomEvent('usephotos', { detail: this._images.map(d => ({ width: d.width, height: d.height, data: d.data })) });
+                this.dispatchEvent(event);
+                this._reset();
             });
         }
-    };
-    MultiCamera.show = function (success, config) {
+    }
+    static show(success, config) {
         console.error('staticshow...');
         var camera = this._camera;
-        var cancelCB = function () {
+        const cancelCB = () => {
             success && success([]);
             camera.removeEventListener('usephotos', usePhotosCB);
             camera.removeEventListener('cancel', cancelCB);
-        }, usePhotosCB = function ($event) {
+        }, usePhotosCB = ($event) => {
             console.error('in use photos');
             success && success($event.detail);
             camera.removeEventListener('usephotos', usePhotosCB);
@@ -663,39 +637,46 @@ var MultiCamera = /** @class */ (function () {
         camera.addEventListener('cancel', cancelCB);
         camera.show(config);
         return this;
-    };
-    MultiCamera.hide = function () {
+    }
+    static hide() {
         if (this._camera) {
             this._camera.hide();
         }
         return this;
-    };
-    MultiCamera.addEventListener = function () {
+    }
+    static addEventListener() {
         this._camera.addEventListener.apply(this._camera, arguments);
         return this;
-    };
-    MultiCamera.removeEventListener = function () {
+    }
+    static removeEventListener() {
         this._camera.removeEventListener.apply(this._camera, arguments);
         return this;
-    };
-    MultiCamera.touchTypes = {
-        NONE: 0,
-        DRAG_ZOOM_THUMB: 1,
-        DRAG_ZOOM_FINGERS: 2,
-        HOLD_ZOOM_PLUS: 4,
-        HOLD_ZOOM_MINUS: 8
-    };
-    MultiCamera._photoWrapperTemplate = (function () {
-        var result = document.createElement('div');
-        result.innerHTML = "\n            <div class=\"camera-photo-wrapper\">\n                <div class=\"camera-photo\"></div>\n                <div class=\"camera-photo-remove\">-</div>\n            </div> ";
-        return result.children[0];
-    })();
-    MultiCamera._template = (function () {
-        var result = document.createElement('div');
-        result.innerHTML = "\n            " + html + "\n            <style>\n            " + css + "\n            </style>\n        ";
-        return result.children[0];
-    })();
-    return MultiCamera;
-}());
-exports.MultiCamera = MultiCamera;
+    }
+}
+MultiCamera.touchTypes = {
+    NONE: 0,
+    DRAG_ZOOM_THUMB: 1,
+    DRAG_ZOOM_FINGERS: 2,
+    HOLD_ZOOM_PLUS: 4,
+    HOLD_ZOOM_MINUS: 8
+};
+MultiCamera._photoWrapperTemplate = (() => {
+    const result = document.createElement('div');
+    result.innerHTML = `
+            <div class="camera-photo-wrapper">
+                <div class="camera-photo"></div>
+                <div class="camera-photo-remove">-</div>
+            </div> `;
+    return result.children[0];
+})();
+MultiCamera._template = (() => {
+    const result = document.createElement('div');
+    result.innerHTML = `
+            ${html}
+            <style>
+            ${css}
+            </style>
+        `;
+    return result.children[0];
+})();
 //# sourceMappingURL=multicamera.js.map

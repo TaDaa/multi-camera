@@ -1,9 +1,10 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2015",
     "sourceMap": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "declaration": true
   },
   "files": ["./src/index.ts"]
 }
