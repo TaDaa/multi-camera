@@ -1,5 +1,5 @@
-import * as html from './multicamera.html';
-import * as css from './multicamera.css';
+import {html} from './multicamera.html';
+import {css} from './multicamera.css';
 
 interface MultiCameraConfig {
 }

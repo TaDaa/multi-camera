@@ -1,4 +1,4 @@
-export default `
+export const css = `
     .camera-photo-overlay-text.back {
         transition: opacity 300ms;
         position: absolute;

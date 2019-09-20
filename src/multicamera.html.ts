@@ -1,4 +1,4 @@
-export default `
+export const html = `
 <div class="camera-overlay">
     <div class="camera-zoom camera-zoom-part">
         <div class="camera-zoom-stretch camera-zoom-part"></div>
