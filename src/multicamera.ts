@@ -943,4 +943,5 @@ export class MultiCamera {
     })();
 
 }
+window['MultiCamera'] = MultiCamera;
 
