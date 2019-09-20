@@ -78,8 +78,8 @@ export class MultiCamera {
         yStart?: number;
         target?: HTMLElement;
         startEvent?: Event;
-        plusTimer?: number;
-        minusTimer?: number;
+        plusTimer?: any;
+        minusTimer?: any;
         starts?: {length: number, [key: number]: {x: number; y:number;}};
         order?: number[]
         not_click?: boolean;

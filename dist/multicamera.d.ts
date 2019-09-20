@@ -50,8 +50,8 @@ export declare class MultiCamera {
         yStart?: number;
         target?: HTMLElement;
         startEvent?: Event;
-        plusTimer?: number;
-        minusTimer?: number;
+        plusTimer?: any;
+        minusTimer?: any;
         starts?: {
             length: number;
             [key: number]: {
