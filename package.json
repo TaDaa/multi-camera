@@ -2,10 +2,12 @@
   "name": "multi-camera",
   "version": "0.0.1",
   "description": "IOS Cordova Camera for taking multiple pictures",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc --project ./"
+    "build": "npm run build:typescript && npm run build:parcel",
+    "build:typescript": "./node_modules/typescript/bin/tsc --project ./",
+    "build:parcel": "./node_modules/parcel-bundler/bin/cli.js build -o multi-camera.js ./lib/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,8 @@
     "url": "https://github.com/TaDaa/multi-camera/issues"
   },
   "homepage": "https://github.com/TaDaa/multi-camera#readme",
-  "dependencies": {
+  "devDependencies": {
+    "parcel-bundler": "^1.12.3",
+    "typescript": "^3.6.3"
   }
 }

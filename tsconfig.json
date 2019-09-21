@@ -1,10 +1,9 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "umd",
-    "target": "es5",
+    "target": "ES2018",
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
     "declaration": true
   },
   "files": ["./src/index.ts"]
