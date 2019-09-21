@@ -1,13 +1,11 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "module": "system",
-    "moduleResolution": "node",
+    "module": "umd",
     "target": "es5",
     "sourceMap": true,
     "outDir": "./dist",
-    "declaration": true,
-    "outFile": "dist/multicamera.js"
+    "declaration": true
   },
   "files": ["./src/index.ts"]
 }
