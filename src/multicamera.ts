@@ -555,7 +555,8 @@ export class MultiCamera {
     _doLayout () {
         const images = this._images,
             width = 3.5,
-            ln = images.length;
+            ln = images.length,
+            usePhotos = this._elements.usePhotos;
         
         var image: MultiCameraImage,
         i = 0;
@@ -565,6 +566,15 @@ export class MultiCamera {
             image.x = i * width;
             image.wrapper.style.transform = `translate(${(i*width)}em, 0em)scale(1)`;
         }
+
+        if (ln) {
+            if (!usePhotos.classList.contains('has-photos')) {
+               usePhotos.classList.add('has-photos');
+            }
+        } else if (usePhotos.classList.contains('has-photos')) {
+           usePhotos.classList.remove('has-photos');
+        }
+
         return this;
     }
 
