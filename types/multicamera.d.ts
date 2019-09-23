@@ -78,6 +78,7 @@ export declare class MultiCamera {
     takePhoto(): void;
     _removeImage(image: MultiCameraImage): void;
     _chooseActivePhoto(image: MultiCameraImage, event: Event): void;
+    _getEmToPx(): number;
     _hidePhotoOverlay(): void;
     _showPhotoOverlay(): void;
     _centerPhotoOverlay(): void;

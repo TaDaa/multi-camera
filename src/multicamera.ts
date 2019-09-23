@@ -114,16 +114,7 @@ export class MultiCamera {
             photoOverlay: element.querySelector('.camera-photo-overlay'),
             photoOverlayBackground: element.querySelector('.camera-photo-overlay-background'),
             back: element.querySelector('.camera-photo-overlay-text.back')
-        },
-        emTest = document.createElement('div');
-        emTest.style.width = emTest.style.height = '1em';
-        emTest.style.position = 'absolute';
-        emTest.style.opacity = '0';
-        this._element.appendChild(emTest);
-        this._emToPx = emTest.clientWidth;
-        this._element.removeChild(emTest);
-        console.error(element);
-        console.error(overlay);
+        };
 
         overlay.style.display = 'none';
 
@@ -380,9 +371,23 @@ export class MultiCamera {
         this._showPhotoOverlay();
         image.wrapper.classList.add('active');
     }
+    
+    _getEmToPx() {
+        if (!this._emToPx) {
+            const emTest = document.createElement('div');
+            emTest.style.width = emTest.style.height = '1em';
+            emTest.style.position = 'absolute';
+            emTest.style.opacity = '0';
+            this._element.appendChild(emTest);
+            this._emToPx = emTest.clientWidth;
+            this._element.removeChild(emTest);
+        }
+        return this._emToPx;
+   }
 
     _hidePhotoOverlay () {
         const image = this._activePhoto,
+            emToPx = this._getEmToPx(),
             {wrapper: original} = image || {wrapper: undefined},
             wrapper = this._showingPhotoOverlay !== false ? this._showingPhotoOverlay.wrapper : this._showingPhotoOverlay,
             rect = original && original.getBoundingClientRect() as ClientRect & {x: number},
@@ -401,7 +406,7 @@ export class MultiCamera {
             elements.photoOverlayBackground.style.opacity = '0';
             wrapper.style.height = null;
             wrapper.style.width = null;
-            wrapper.style.left = `${rect.x / this._emToPx}em`;
+            wrapper.style.left = `${rect.x / emToPx}em`;
             wrapper.style.bottom = '0em';
             photo.style.opacity = '0';
             if (image.removed) {
@@ -420,6 +425,7 @@ export class MultiCamera {
 
     _showPhotoOverlay () {
         const image =  this._activePhoto,
+            emToPx = this._getEmToPx(),
             {width, height, wrapper: original, data} = image,
             rect = original.getBoundingClientRect() as ClientRect & {x: number},
             elements = this._elements;
@@ -436,7 +442,7 @@ export class MultiCamera {
         elements.photoOverlay.style.display = 'block';
 
         wrapper.style.transform = 'translate(0em,0em)scale(1)'
-        wrapper.style.left = `${rect.x/this._emToPx}em`
+        wrapper.style.left = `${rect.x/emToPx}em`
 
         elements.photoOverlay.appendChild(wrapper);
         wrapper.removeChild(remove)
@@ -453,6 +459,7 @@ export class MultiCamera {
 
     _centerPhotoOverlay () {
         const dimensions = this.getScreenDimensions(),
+            emToPx = this._getEmToPx(),
             cloneImage = this._showingPhotoOverlay;
         var {width, height, wrapper} = cloneImage || {width: undefined, height: undefined, wrapper: undefined};
         var scale: number; 
@@ -469,9 +476,10 @@ export class MultiCamera {
             scale = 1;
         }
 
-        const cx = (dimensions.width - width * scale) / 2 / this._emToPx,
-            cy = (dimensions.height - height * scale) / 2 / this._emToPx;
+        const cx = (dimensions.width - width * scale) / 2 / emToPx,
+            cy = (dimensions.height - height * scale) / 2 / emToPx;
 
+        console.error(scale, cx, cy, width, height, dimensions, emToPx);
         wrapper.style.height = `${height*scale}px`;
         wrapper.style.width = `${width*scale}px`;
         wrapper.style.left = `${cx}em`;
@@ -884,7 +892,6 @@ export class MultiCamera {
     touchTypes = MultiCamera.touchTypes;
 
     static show (success: (images: MultiCameraImage[]) => any, config: MultiCameraConfig) {
-        console.error('staticshow...');
         var camera = this._camera;
         const cancelCB = () => {
             success && success([]);
@@ -892,7 +899,6 @@ export class MultiCamera {
             camera.removeEventListener('cancel', cancelCB);
         },
         usePhotosCB = ($event: CustomEvent) => {
-            console.error('in use photos');
             success && success($event.detail);
             camera.removeEventListener('usephotos', usePhotosCB);
             camera.removeEventListener('cancel', cancelCB);
@@ -942,10 +948,8 @@ export class MultiCamera {
 
     static _template: HTMLElement = (() => {
         const result = document.createElement('span');
-        result.innerHTML = `
-            ${html}
-        `;
-        return result as HTMLElement
+        result.innerHTML = `${html}`;
+        return result.children[0] as HTMLElement
     })();
 
 }
