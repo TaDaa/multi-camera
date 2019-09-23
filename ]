@@ -1,4 +1,3 @@
-import {css} from './multicamera.css';
 export const html = `
 <div class="camera-overlay">
     <style>

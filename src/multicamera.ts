@@ -944,9 +944,6 @@ export class MultiCamera {
         const result = document.createElement('span');
         result.innerHTML = `
             ${html}
-            <style>
-            ${css}
-            </style>
         `;
         return result as HTMLElement
     })();
