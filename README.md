@@ -8,7 +8,7 @@ This plugin is a HTML/Javascript UI built ontop of the cordova-plugin-camera-pre
 -   https://github.com/cordova-plugin-camera-preview/cordova-plugin-camera-preview
 
 ##Installation
--   `npm install TaDaa/multi-camera`
+-   `npm install multi-camera`
 
 ##Usage options:
 -  include `/node_modules/multi-camera/dist/multi-camera.iimd.js` in build or as a script. 
