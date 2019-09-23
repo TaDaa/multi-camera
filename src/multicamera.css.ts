@@ -164,24 +164,13 @@ export const css = `
     .taking-picture .camera-take-photo {
         transform: scale(0.9)translate(-50%, -50%);
     }
-    .camera-reverse-back {
-        top: 50%;
-        right: 0.95em;
-        transform: scale(1)translate(0,-5em)translate(-50%, -50%);
-        height: 2.5em;
-        width: 2.5em;
-        background-image:url('/images/camera_reverse_back.svg');
-        background-repeat:no-repeat;
-        background-size:2.5em 2.5em;
-        position: absolute;
-    }
     .camera-reverse {
         top: 50%;
         right: 0.95em;
         transform: scale(1)translate(0,-5em)translate(-50%, -50%);
         height: 2.5em;
         width: 2.5em;
-        background-image:url('/images/camera_reverse.svg');
+        background-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3C!-- Svg Vector Icons : http://www.onlinewebfonts.com/icon --%3E%3C!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 1000 1000' enable-background='new 0 0 1000 1000' xml:space='preserve'%3E%3Cmetadata%3E Svg Vector Icons : http://www.onlinewebfonts.com/icon %3C/metadata%3E%3Cg fill='rgba(255,255,255,.9)'%3E%3Cpath stroke='rgba(0,0,0,0.5)' stroke-width='40' fill='transparent' d='M912.2,255H754.6c-81.9-91.9-107.7-122.5-139.2-122.5H389.6c-31.4,0-56.6,30.6-139.1,122.5h-33.8v-40.8h-86.8V255H95.5c-45,0-85.5,33.7-85.5,78.3v449.2c0,44.6,40.5,85,85.5,85h816.7c45,0,77.8-40.4,77.8-85V333.3C990,288.7,957.2,255,912.2,255z'/%3E%3Cpath stroke='rgba(255,255,255,.9)' stroke-width='25' fill='rgba(0,0,0,0.4)' d='M912.2,255H754.6c-81.9-91.9-107.7-122.5-139.2-122.5H389.6c-31.4,0-56.6,30.6-139.1,122.5h-33.8v-40.8h-86.8V255H95.5c-45,0-85.5,33.7-85.5,78.3v449.2c0,44.6,40.5,85,85.5,85h816.7c45,0,77.8-40.4,77.8-85V333.3C990,288.7,957.2,255,912.2,255z'/%3E%3Cpath d='M616.9,659.8c-33.5,28.1-73.9,44.3-116.9,44.3c-92.8,0-169.2-73.9-180.9-158.1h78.1L298,418.3l-95.8,127.6h75.2C289.4,653.1,383.9,745,500,745c53.3,0,105.1-19.3,145.7-54.1l6-5.5l-29.6-29.8L616.9,659.8z'/%3E%3Cpath d='M652.5,354.2C611.1,316.5,557,296,500,296c-53.3,0-105.1,19.3-145.7,54.1l-6,5.2l29.6,29.6l5.2-4.4c33-27.7,74.5-43.4,116.9-43.4c92.8,0,169.1,73.5,180.9,162.8h-78.2l99.1,130.7l96-130.7h-75.3C716.8,449,692.1,390.4,652.5,354.2z'/%3E%3C/g%3E%3C/svg%3E%0A");
         background-repeat:no-repeat;
         background-size:2.5em 2.5em;
         position: absolute;
@@ -191,10 +180,6 @@ export const css = `
         bottom:0;
         left:0;
         right:0;
-        //top: 0;
-        //z-index:-1;
-        //pointer-events: none;
-        //height:5em;
         height: 4.1em;
         background:rgba(0,0,0,0.1);
         overflow-x:scroll;
@@ -213,7 +198,6 @@ export const css = `
         text-shadow:0px 0px 10px rgba(0,0,0,0.5);
         text-decoration: none;
         padding:0 0.5em;
-        //background:rgba(0,0,0,0.35);
     }
     .camera-use-photos {
         position:absolute;
@@ -253,7 +237,6 @@ export const css = `
         bottom: 0;
         box-shadow: inset 0px 0px 0px 1px rgba(255,255,255,0.2);
         background:rgba(0,0,0,0.3);
-        //opacity: 0.25;
         overflow:visible;
         left: 0;
         right: 0;
@@ -339,27 +322,16 @@ export const css = `
         text-shadow:  0px 0px 1px black;
         background-color:rgba(0,0,0,0.5);
         background-color:rgba(200,200,200,.8);
-        //border:solid 1px rgba(255,255,255,.5);
         color: white;
-        //border-radius:50%;
-        //box-shadow: -1px 0px 0px white;
         text-align:center;
         transition: transform 300ms;
         transform: translateX(-100%);
         position:absolute;
-        //top:-1em;
         z-index:1;
         font-weight:bold;
-        //bottom:100%;
-        //left:50%;
         width:100%;
-        //top:0;
-        //padding: 0.05em 0 0.05em;
         height: auto;
-        //padding: 0.15em 0;
-        //bottom:100%;
         top: 0.05em;
-        //box-shadow: 0px 0px 0px 1px rgba(255,255,255,.5);
         right: 0.05em;
         border-radius: 50%;
         height: 1.5em;

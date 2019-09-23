@@ -4,7 +4,8 @@
     "target": "es5",
     "sourceMap": true,
     "outDir": "./lib",
-    "declaration": true
+    "declaration": true,
+    "declarationDir": "./types"
   },
   "files": ["./src/index.ts"]
 }

@@ -9,7 +9,6 @@ export const html = `
         <div class="camera-zoom-minus">-</div>
         <div class="camera-zoom-thumb camera-zoom-part"></div>
     </div>
-    <div class="camera-reverse-back"></div>
     <div class="camera-reverse"></div>
     <div class="camera-take-photo-border camera-take-photo-part"></div>
     <div class="camera-take-photo camera-take-photo-part"></div>

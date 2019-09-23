@@ -5,9 +5,7 @@
   "main": "dist/multi-camera.cjs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build:typescript && npx rollup --config ./rollup.config.js",
-    "build:typescript": "./node_modules/typescript/bin/tsc --project ./",
-    "build:parcel": "./node_modules/parcel-bundler/bin/cli.js build -o multi-camera.js ./lib/index.js"
+    "build": "npx rollup --config ./rollup.config.js"
   },
   "repository": {
     "type": "git",
@@ -31,16 +29,12 @@
   "homepage": "https://github.com/TaDaa/multi-camera#readme",
   "module": "dist/multi-camera.esm.js",
   "browser": "dist/multi-camera.umd.js",
+  "iife": "dist/multi-camera.iife.js",
+  "typings": "types/index.d.ts",
   "devDependencies": {
-    "@babel/core": "^7.6.0",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
     "rollup": "^1.21.4",
-    "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-typescript": "^1.0.1",
     "rollup-plugin-typescript2": "github:ezolenko/rollup-plugin-typescript2",
-    "tslib": "^1.10.0",
     "typescript": "^3.6.3"
   }
 }
