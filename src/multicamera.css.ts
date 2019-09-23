@@ -205,6 +205,11 @@ export const css = `
         bottom: 4.0em;
         border-bottom:solid 2px rgba(100,255,100,0.7);
         padding:0.2em 0.5em;
+        transition: opacity 300ms;
+        opacity: 0;
+    }
+    .camera-use-photos.has-photos {
+        opacity: 1;
     }
     .camera-cancel {
         position: absolute;

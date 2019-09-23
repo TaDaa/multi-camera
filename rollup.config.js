@@ -12,12 +12,12 @@ export default [{
                 format: 'es',
                 sourcemap: 'inline'
         },{
-                name: 'MultiCamera',
+                name: 'multicamera',
                 file: pkg.browser,
                 format: 'umd',
                 sourcemap: 'inline'
         },{
-                name: 'MultiCamera',
+                name: 'multicamera',
                 file: pkg.iife,
                 format: 'iife',
                 sourcemap: 'inline'
