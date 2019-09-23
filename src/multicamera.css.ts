@@ -4,7 +4,6 @@ export const css = `
         position: absolute;
         left: 0.3em;
         bottom: 4.0em;
-        border-bottom:solid 2px blue;
         text-shadow:0px 0px 10px rgba(0,0,0,0.5);
         color: white;
         z-index: 1;
@@ -203,7 +202,6 @@ export const css = `
         position:absolute;
         right: 0.3em;
         bottom: 4.0em;
-        border-bottom:solid 2px rgba(100,255,100,0.7);
         padding:0.2em 0.5em;
         transition: opacity 300ms;
         opacity: 0;
@@ -215,7 +213,6 @@ export const css = `
         position: absolute;
         left: 0.3em;
         bottom: 4.0em;
-        border-bottom:solid 2px red;
         padding:0.2em 0.5em;
     }
     .camera-zoom {
