@@ -1,6 +1,4 @@
-
 import {html} from './multicamera.html';
-import {css} from './multicamera.css';
 
 interface MultiCameraConfig {
 }
@@ -274,7 +272,7 @@ export class MultiCamera {
             var resolved = false;
             const preview = window['CameraPreview'];
 
-            preview.takePicture({width, height}, (base64: string[]) => {
+            preview.takePicture({width, height, quality: 90}, (base64: string[]) => {
                 const image:  MultiCameraImage = {
                     data: `data:image/jpg;base64,${base64[0]}`,
                     width,
@@ -479,7 +477,6 @@ export class MultiCamera {
         const cx = (dimensions.width - width * scale) / 2 / emToPx,
             cy = (dimensions.height - height * scale) / 2 / emToPx;
 
-        console.error(scale, cx, cy, width, height, dimensions, emToPx);
         wrapper.style.height = `${height*scale}px`;
         wrapper.style.width = `${width*scale}px`;
         wrapper.style.left = `${cx}em`;
