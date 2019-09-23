@@ -941,14 +941,14 @@ export class MultiCamera {
     })();
 
     static _template: HTMLElement = (() => {
-        const result = document.createElement('div');
+        const result = document.createElement('span');
         result.innerHTML = `
             ${html}
             <style>
             ${css}
             </style>
         `;
-        return result.children[0] as HTMLElement
+        return result as HTMLElement
     })();
 
 }
