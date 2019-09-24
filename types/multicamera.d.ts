@@ -1,4 +1,6 @@
 interface MultiCameraConfig {
+    maxWidth?: number;
+    maxHeight?: number;
 }
 export interface MultiCameraImg {
     data: string;
@@ -20,9 +22,24 @@ export interface MultiCameraEvents {
     tookphoto: TookPhotoEvent;
 }
 export interface MultiCameraImage extends MultiCameraImg {
-    wrapper?: HTMLElement;
-    element?: HTMLElement;
     removed?: boolean;
+    preview?: {
+        width?: number;
+        height?: number;
+    };
+    element?: {
+        x?: number;
+        y?: number;
+        scale?: number;
+        el?: HTMLElement;
+    };
+    wrapper?: {
+        x?: number;
+        y?: number;
+        scale?: number;
+        size?: number;
+        el?: HTMLElement;
+    };
     x?: number;
 }
 export declare type MultiCameraElements = 'overlay' | 'zoomPlus' | 'zoomMinus' | 'zoomThumb' | 'zoomBG' | 'zoomBGWrapper' | 'reverseCamera' | 'cancel' | 'takePhoto' | 'usePhotos' | 'bottomToolbar' | 'topIndicatorText' | 'bottomIndicatorText' | 'leftIndicatorText' | 'rightIndicatorText' | 'photoOverlay' | 'photoOverlayBackground' | 'back';
@@ -34,6 +51,7 @@ export declare class MultiCamera {
     };
     _emToPx: number;
     _show: MultiCameraConfig | boolean;
+    _config: MultiCameraConfig;
     _ready: boolean;
     _takingPicture: boolean;
     _showingPhotoOverlay: MultiCameraImage | false;
@@ -73,7 +91,8 @@ export declare class MultiCamera {
         width: number;
         height: number;
     };
-    show(config: MultiCameraConfig): this;
+    getSupportedSizes(onSuccess: Function, onError: Function): this;
+    show(config: MultiCameraConfig | true): this;
     hide(): this;
     takePhoto(): void;
     _removeImage(image: MultiCameraImage): void;
@@ -127,6 +146,7 @@ export declare class MultiCamera {
     };
     static show(success: (images: MultiCameraImage[]) => any, config: MultiCameraConfig): typeof MultiCamera;
     static hide(): typeof MultiCamera;
+    static getCamera(): MultiCamera;
     static addEventListener(): typeof MultiCamera;
     static removeEventListener(): typeof MultiCamera;
     static _photoWrapperTemplate: HTMLElement;

@@ -1,6 +1,8 @@
 import {html} from './multicamera.html';
 
 interface MultiCameraConfig {
+   maxWidth?: number;
+   maxHeight?: number;
 }
 
 export interface MultiCameraImg {
@@ -27,9 +29,10 @@ export interface MultiCameraEvents {
 }
 
 export interface MultiCameraImage extends MultiCameraImg {
-    wrapper?: HTMLElement;
-    element?: HTMLElement;
     removed?: boolean;
+    preview?: {width?: number; height?: number};
+    element?: {x?: number; y?: number; scale?: number, el?: HTMLElement};
+    wrapper?: {x?: number; y?: number; scale?: number; size?: number; el?: HTMLElement};
     x?: number;
 }
 
@@ -59,6 +62,7 @@ export class MultiCamera {
     _elements: {[key in MultiCameraElements]: HTMLElement};
     _emToPx: number;
     _show: MultiCameraConfig | boolean;
+    _config: MultiCameraConfig;
     _ready: boolean;
     _takingPicture: boolean;
     _showingPhotoOverlay: MultiCameraImage | false;
@@ -171,7 +175,13 @@ export class MultiCamera {
         return {width, height};
     }
 
-    show (config: MultiCameraConfig) {
+    getSupportedSizes (onSuccess: Function, onError: Function) {
+       const preview = window['CameraPreview'];
+       preview.getSupportedPictureSizes(onSuccess, onError);
+       return this;
+    }
+
+    show (config: MultiCameraConfig | true) {
         const preview = window['CameraPreview'],
             {overlay} = this._elements,
             {width, height} = this.getScreenDimensions();
@@ -188,6 +198,7 @@ export class MultiCamera {
         }
 
         this._show = true;
+        this._config = (typeof config === 'object' && config) || {};
 
         preview.stopCamera(
             () => {
@@ -244,12 +255,15 @@ export class MultiCamera {
     }
 
     takePhoto () {
+        const config = this._config || {},
+           dimensions = this.getScreenDimensions(),
+           width = dimensions.width > dimensions.height ? config.maxHeight : config.maxWidth,
+           height = dimensions.height > dimensions.width ? config.maxHeight : config.maxWidth;
         if (!this._ready) {
             return;
         }
         const tookPicture = document.createElement('div'),
-            {overlay} = this._elements,
-            {width, height} = this.getScreenDimensions();
+            {overlay} = this._elements;
 
         tookPicture.className = 'camera-took-picture';
 
@@ -272,42 +286,71 @@ export class MultiCamera {
             var resolved = false;
             const preview = window['CameraPreview'];
 
-            preview.takePicture({width, height, quality: 90}, (base64: string[]) => {
-                const image:  MultiCameraImage = {
-                    data: `data:image/jpg;base64,${base64[0]}`,
-                    width,
-                    height
-                },
-                photoWrapper = MultiCamera._photoWrapperTemplate.cloneNode(true) as HTMLElement,
-                photoElement = photoWrapper.querySelector('.camera-photo') as HTMLElement,
-                removeElement = photoWrapper.querySelector('.camera-photo-remove') as HTMLElement,
-                {bottomToolbar} = this._elements,
-                tookPhotoEvent = new CustomEvent('tookphoto', {detail: {data: image.data, width:image.width, height:image.height}});
-
-                photoElement.style.backgroundImage = `url("${image.data}")`;
-                bottomToolbar.insertBefore(photoWrapper, bottomToolbar.childNodes[0]);
-
-                setTimeout(() => {
-                    photoElement.style.transform = 'scale(1)translate(0px, 0px)';
-                    removeElement.style.transform = 'translateX(0px)';
-                });
-
-                removeElement.addEventListener('click', () => {
-                    this._removeImage(image);
-                }, true);
-                photoWrapper.addEventListener('click', ($event: MouseEvent) => {
-                    this._chooseActivePhoto(image, $event);
-                }, true);
+            preview.takePicture({width: width || 0, height: height || 0, quality: 90}, (base64: string[]) => {
+                const data = `data:image/jpg;base64,${base64[0]}`,
+                img = new Image();
+                img.onload = () => {
+                   const image:  MultiCameraImage = {
+                      data: `data:image/jpg;base64,${base64[0]}`,
+                      width: img.width,
+                      height: img.height
+                   },
+                   photoWrapper = MultiCamera._photoWrapperTemplate.cloneNode(true) as HTMLElement,
+                      photoElement = photoWrapper.querySelector('.camera-photo') as HTMLElement,
+                      removeElement = photoWrapper.querySelector('.camera-photo-remove') as HTMLElement,
+                      {bottomToolbar} = this._elements,
+                      tookPhotoEvent = new CustomEvent('tookphoto', {detail: {data: image.data, width:image.width, height:image.height}});
 
 
-                this.dispatchEvent(tookPhotoEvent);
+                   const max = Math.max(dimensions.width, dimensions.height);
 
-                image.wrapper = photoWrapper;
-                image.element = photoElement;
-                this._images.unshift(image);
-                this._doLayout();
-                resolved = true;
-                resolve();
+                   photoElement.style.backgroundImage = `url("${image.data}")`;
+                   bottomToolbar.insertBefore(photoWrapper, bottomToolbar.childNodes[0]);
+
+
+                   image.preview = image.width > image.height ? {
+                      width: max,
+                      height: Math.min(dimensions.height, dimensions.width)
+                   } : {
+                      width: Math.min(dimensions.width, dimensions.height),
+                      height: max 
+                   };
+
+                   image.wrapper = {
+                      el: photoWrapper
+                   };
+                   image.element = {
+                      el: photoElement
+                   };
+
+                   photoElement.style.backgroundImage = `url("${image.data}")`;
+
+                   bottomToolbar.insertBefore(photoWrapper, bottomToolbar.childNodes[0]);
+
+                   setTimeout(() => {
+                      photoElement.style.transform = 'scale(1)translate(0px, 0px)';
+                      removeElement.style.transform = 'translateX(0px)';
+                   });
+
+                   removeElement.addEventListener('click', () => {
+                      this._removeImage(image);
+                   }, true);
+                   photoWrapper.addEventListener('click', ($event: MouseEvent) => {
+                      this._chooseActivePhoto(image, $event);
+                   }, true);
+
+
+                   this.dispatchEvent(tookPhotoEvent);
+
+                   this._images.unshift(image);
+                   this._doLayout();
+                   resolved = true;
+                   resolve();
+                };
+                img.onerror = () => {
+                   resolve();
+                }
+                img.src = data;
             }, () => {
                 resolved = true;
                 resolve();
@@ -341,11 +384,11 @@ export class MultiCamera {
             this._hidePhotoOverlay();
         }
         image.removed = true;
-        wrapper.style.transform = `${wrapper.style.transform.split('scale(1)')[0]}scale(0)`;
-        wrapper.style.opacity = '0';
-        wrapper.addEventListener('transitionend', () => {
-            if (wrapper.parentNode) {
-                this._elements.bottomToolbar.removeChild(wrapper)
+        wrapper.el.style.transform = `${wrapper.el.style.transform.split('scale(1)')[0]}scale(0)`;
+        wrapper.el.style.opacity = '0';
+        wrapper.el.addEventListener('transitionend', () => {
+            if (wrapper.el.parentNode) {
+                this._elements.bottomToolbar.removeChild(wrapper.el)
             }
         });
         this._doLayout();
@@ -363,11 +406,11 @@ export class MultiCamera {
             return;
         }
         if (this._activePhoto) {
-            this._activePhoto.wrapper.classList.remove('active')
+            this._activePhoto.wrapper.el.classList.remove('active')
         }
         this._activePhoto = image;
         this._showPhotoOverlay();
-        image.wrapper.classList.add('active');
+        image.wrapper.el.classList.add('active');
     }
     
     _getEmToPx() {
@@ -388,34 +431,34 @@ export class MultiCamera {
             emToPx = this._getEmToPx(),
             {wrapper: original} = image || {wrapper: undefined},
             wrapper = this._showingPhotoOverlay !== false ? this._showingPhotoOverlay.wrapper : this._showingPhotoOverlay,
-            rect = original && original.getBoundingClientRect() as ClientRect & {x: number},
+            rect = original && original.el.getBoundingClientRect() as ClientRect & {x: number},
             elements = this._elements;
 
         if (!wrapper) {
             return;
         }
 
-        original.classList.remove('active');
+        original.el.classList.remove('active');
         this._showingPhotoOverlay = false;
 
-        if (wrapper.parentNode === elements.photoOverlay) {
-            const photo = wrapper.querySelector('.camera-photo') as HTMLElement;
+        if (wrapper.el.parentNode === elements.photoOverlay) {
+            const photo = wrapper.el.querySelector('.camera-photo') as HTMLElement;
             elements.back.style.opacity = '0';
             elements.photoOverlayBackground.style.opacity = '0';
-            wrapper.style.height = null;
-            wrapper.style.width = null;
-            wrapper.style.left = `${rect.x / emToPx}em`;
-            wrapper.style.bottom = '0em';
+            wrapper.el.style.height = null;
+            wrapper.el.style.width = null;
+            wrapper.el.style.left = `${rect.x / emToPx}em`;
+            wrapper.el.style.bottom = '0em';
             photo.style.opacity = '0';
             if (image.removed) {
-                wrapper.style.transform = 'translate(0em,0em)scale(0)';
+                wrapper.el.style.transform = 'translate(0em,0em)scale(0)';
             }
-            wrapper.addEventListener('transitionend', () => {
-                if (wrapper.parentNode) {
+            wrapper.el.addEventListener('transitionend', () => {
+                if (wrapper.el.parentNode) {
                     if (!this._showingPhotoOverlay) {
                         elements.photoOverlay.style.display = 'none';
                     }
-                   elements.photoOverlay.removeChild(wrapper);
+                   elements.photoOverlay.removeChild(wrapper.el);
                 }
             });
         }
@@ -424,26 +467,26 @@ export class MultiCamera {
     _showPhotoOverlay () {
         const image =  this._activePhoto,
             emToPx = this._getEmToPx(),
-            {width, height, wrapper: original, data} = image,
-            rect = original.getBoundingClientRect() as ClientRect & {x: number},
+            {width, height, wrapper: original, data, preview} = image,
+            rect = original.el.getBoundingClientRect() as ClientRect & {x: number},
             elements = this._elements;
 
         if (this._showingPhotoOverlay) {
             this._hidePhotoOverlay()
         }
 
-        const {wrapper} = this._showingPhotoOverlay = {data, width, height, wrapper: original.cloneNode(true) as HTMLElement},
-            photo = wrapper.querySelector('.camera-photo') as HTMLElement,
-            remove = wrapper.querySelector('.camera-photo-remove')
+        const {wrapper} = this._showingPhotoOverlay = {data, width, height, preview: {...preview}, wrapper: {...image.wrapper, el: original.el.cloneNode(true) as HTMLElement}},
+            photo = wrapper.el.querySelector('.camera-photo') as HTMLElement,
+            remove = wrapper.el.querySelector('.camera-photo-remove')
 
-        wrapper.style.boxShadow = 'none';
+        wrapper.el.style.boxShadow = 'none';
         elements.photoOverlay.style.display = 'block';
 
-        wrapper.style.transform = 'translate(0em,0em)scale(1)'
-        wrapper.style.left = `${rect.x/emToPx}em`
+        wrapper.el.style.transform = 'translate(0em,0em)scale(1)'
+        wrapper.el.style.left = `${rect.x/emToPx}em`
 
-        elements.photoOverlay.appendChild(wrapper);
-        wrapper.removeChild(remove)
+        elements.photoOverlay.appendChild(wrapper.el);
+        wrapper.el.removeChild(remove)
 
         photo.style.opacity = '0';
 
@@ -459,28 +502,28 @@ export class MultiCamera {
         const dimensions = this.getScreenDimensions(),
             emToPx = this._getEmToPx(),
             cloneImage = this._showingPhotoOverlay;
-        var {width, height, wrapper} = cloneImage || {width: undefined, height: undefined, wrapper: undefined};
+        var {wrapper, preview} = cloneImage || {width: undefined, height: undefined, wrapper: undefined, element: undefined, preview: undefined};
         var scale: number; 
 
-        if (width > dimensions.width) {
-            scale = dimensions.width / width;
+        if (preview.width > dimensions.width) {
+            scale = dimensions.width / preview.width;
         }
-        if (height > dimensions.height) {
-            if (!scale || ((dimensions.height / height) > scale)) {
-                scale = dimensions.height / height;
+        if (preview.height > dimensions.height) {
+            if (!scale || ((dimensions.height / preview.height) > scale)) {
+                scale = dimensions.height / preview.height;
             }
         }
         if (scale === undefined) {
             scale = 1;
         }
 
-        const cx = (dimensions.width - width * scale) / 2 / emToPx,
-            cy = (dimensions.height - height * scale) / 2 / emToPx;
+        const cx = (dimensions.width - preview.width * scale) / 2 / emToPx,
+            cy = (dimensions.height - preview.height * scale) / 2 / emToPx;
 
-        wrapper.style.height = `${height*scale}px`;
-        wrapper.style.width = `${width*scale}px`;
-        wrapper.style.left = `${cx}em`;
-        wrapper.style.bottom = `${cy}em`;
+        wrapper.el.style.height = `${preview.height*scale}px`;
+        wrapper.el.style.width = `${preview.width*scale}px`;
+        wrapper.el.style.left = `${cx}em`;
+        wrapper.el.style.bottom = `${cy}em`;
     }
 
     focus ({x, y}: {x:number, y:number}) {
@@ -569,7 +612,7 @@ export class MultiCamera {
         for (;i<ln;i++) {
             image = images[i];
             image.x = i * width;
-            image.wrapper.style.transform = `translate(${(i*width)}em, 0em)scale(1)`;
+            image.wrapper.el.style.transform = `translate(${(i*width)}em, 0em)scale(1)`;
         }
 
         if (ln) {
@@ -906,10 +949,7 @@ export class MultiCamera {
                 success = undefined;
             }
         }
-        if (!camera) {
-            camera = this._camera = new MultiCamera();
-            document.body.appendChild(camera._element);
-        }
+        camera = this.getCamera();
         camera.addEventListener('usephotos', usePhotosCB);
         camera.addEventListener('cancel', cancelCB);
         camera.show(config);
@@ -917,21 +957,28 @@ export class MultiCamera {
     }
 
     static hide () {
-        if (this._camera) {
-            this._camera.hide();
-        }
-        return this;
+       this.getCamera().hide();
+       return this;
+    }
+
+    static getCamera() {
+       if (!this._camera) {
+          this._camera = new MultiCamera();
+          document.body.appendChild(this._camera._element);
+       }
+       return this._camera;
     }
 
     static addEventListener () {
-        this._camera.addEventListener.apply(this._camera, arguments);
+        this.getCamera().addEventListener.apply(this._camera, arguments);
         return this;
     }
 
     static removeEventListener () {
-        this._camera.removeEventListener.apply(this._camera, arguments);
+        this.getCamera().removeEventListener.apply(this._camera, arguments);
         return this;
     }
+
 
     static _photoWrapperTemplate: HTMLElement = (() => {
         const result = document.createElement('div');

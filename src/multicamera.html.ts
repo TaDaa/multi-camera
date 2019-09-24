@@ -36,7 +36,7 @@ export const html = `
     </div>
     <div class="camera-photo-overlay">
         <div class="camera-photo-overlay-background"></div>
-        <a href="javascript:void(0)" class="camera-photo-overlay-text back">Back To Camera</a>
+        <a href="javascript:void(0)" class="camera-photo-overlay-text back">Back</a>
     </div>
     <div class="camera-bottom-toolbar" >
     </div>

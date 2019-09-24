@@ -292,7 +292,10 @@ export const css = `
         width: 3.5em;
         height: 3.5em;
         opacity: 0.85;
+        bottom: 0;
         transform-origin: 0% 50%;
+        //top: 0;
+        //transform-origin: 0% 0%;
     }
     .camera-photo-wrapper.active::after {
         content: " ";
@@ -305,7 +308,7 @@ export const css = `
     }
     .camera-photo {
         background-color: black;
-        transition: transform 300ms, opacity 300ms;
+        transition: transform 300ms, opacity 300ms, width 300ms, height 300ms;
         transform: scale(0)translate(0px,0px);
         transform-origin: 0% 50%;
         opacity: 1;
@@ -316,6 +319,8 @@ export const css = `
         background-repeat:no-repeat;
         position:absolute;
         z-index:0;
+        bottom: 0;
+        //top: 0;
     }
     .camera-photo-remove {
         background-color:rgba(255,0,0,0.5);
