@@ -1,6 +1,6 @@
 {
   "name": "multi-camera",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "IOS Cordova Camera for taking multiple pictures",
   "main": "dist/multi-camera.cjs.js",
   "scripts": {

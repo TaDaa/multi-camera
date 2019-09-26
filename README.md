@@ -11,7 +11,7 @@ This plugin is a HTML/Javascript UI built ontop of the cordova-plugin-camera-pre
 -   `npm install multi-camera`
 
 ##Usage options:
--  include `/node_modules/multi-camera/dist/multi-camera.iimd.js` in build or as a script. Access via "window.multicamera.MultiCamera"
+-  include `/node_modules/multi-camera/dist/multi-camera.iife.js` in build or as a script. Access via "window.multicamera.MultiCamera"
 -  include `/node_modules/multi-camera/dist/multi-camera.umd.js` in build or as a script.  Access via "window.multicamera.MultiCamera"
 -  `import {MultiCamera} from 'multi-camera';`
 -  `var MultiCamera = require('multi-camera').MultiCamera;`
